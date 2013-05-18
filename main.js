@@ -35,7 +35,7 @@
         }
         console.timeEnd('index')
         console.log(index)
-        $('.loading').remove()
+        $('.loading').hide().remove()
     })
 
     // do the search
@@ -99,7 +99,11 @@
     // clicked on a methods, show docs
     $('.results').on('click', 'li.method', function(evt) {
         var idxs = this.dataset['idx'].split('.')
-        var method = docs.modules[idxs[0]].methods[idxs[1]]
+        if(idxs[0] === 'g') {
+            var method = docs.methods[idxs[1]]
+        } else {
+            var method = docs.modules[idxs[0]].methods[idxs[1]]
+        }
         $('.doc')
             .html('')
             .append('<h1>' + method.textRaw + '</h1>')
