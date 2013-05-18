@@ -51,6 +51,11 @@
         }
         console.timeEnd('index')
         console.log(index)
+        if(window.location.hash.match(/#!(.+)/)) {
+            var idx = window.location.hash.replace(/^#!/, '').replace('.', '#')
+            console.log(idx)
+            display(idx)
+        }
         $('.loading').hide().remove()
     })
 
@@ -112,11 +117,15 @@
 
     // clicked on a methods, show docs
     $('.results').on('click', 'li.method', function(evt) {
-        var idxs = this.dataset['idx']
-        var method = index[idxs]
+        display(this.dataset['idx'])
+    })
+
+    function display(idx) {
+        var method = index[idx]
+        window.location.hash = '#!' + idx.replace('#', '.')
         $('.doc')
             .html('')
             .append('<h1>' + method.textRaw + '</h1>')
             .append('<section>' + method.desc + '</section>')
-    })
+    }
 })()
