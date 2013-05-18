@@ -168,9 +168,35 @@ function indexModule(index, mod)
             return;
         }
         var method = index[idx]
+
+        var header = method.textRaw
+        if(method.type === 'method' && method.signatures) {
+            header = idx.replace(/#.*$/, '') + '.' +
+                        method.name + '('
+
+
+            header += method.signatures[0].params.map(function(e) {
+                var name = e.name
+                if(e.desc) {
+                    name = '<abbr title="' + e.type + "\n" + e.desc + '">' + name + '</abbr>';
+                }
+                if(e.optional) {
+                    name = '[' + name + ']'
+                }
+                return name
+            }).join(', ') + ')'
+
+            if(method.signatures[0].return) {
+                var type = method.signatures[0].return.type
+                if(method.signatures[0].return.desc) {
+                    type = '<abbr title="' + method.signatures[0].return.desc + '">' + type + '</abbr>'
+                }
+                header += '<br /> <i class="icon-caret-right"></i> ' + type
+            }
+        }
         $('.doc')
             .html('')
-            .append('<h1>' + method.textRaw + '</h1>')
+            .append('<h1>' + header + '</h1>')
             .append('<section>' + method.desc + '</section>')
     }
 })()
