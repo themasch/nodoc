@@ -164,6 +164,9 @@ function indexModule(index, mod)
     }, false)
 
     function display(idx) {
+        if(!index[idx]) {
+            return;
+        }
         var method = index[idx]
         $('.doc')
             .html('')
