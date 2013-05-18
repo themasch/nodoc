@@ -50,18 +50,22 @@
             }
         }
         console.timeEnd('index')
-        console.log(index)
         if(window.location.hash.match(/#!(.+)/)) {
             var idx = window.location.hash.replace(/^#!/, '').replace('.', '#')
             console.log(idx)
             display(idx)
         }
+        if(localStorage.hasOwnProperty('nodoc_lastQuery')) {
+            var qry = localStorage.getItem('nodoc_lastQuery')
+            $('#search')[0].value = qry
+            doSearch(qry)
+        }
         $('.loading').hide().remove()
     })
 
+
     // do the search
-    $('#search').on('keyup', function() {
-        var query = this.value
+    function doSearch(query) {
         var result = []
         var parts = query.split(/\s|#|\./)
         var pool  = index;
@@ -109,10 +113,19 @@
                 list[mod] = $('<ul>').appendTo($('<li>' + mod + '</li>').appendTo(ul));
             }
             list[mod].append(
-                '<li class="method" data-idx="' + result[i] +
-                '">#' + result[i].split('#')[1] + '</li>'
+                '<li class="method" data-idx="' + result[i] +'">' +
+                    '<a href="#!' + result[i].replace('#', '.') + '">' +
+                        '#' + result[i].split('#')[1] +
+                    '</a>' +
+                '</li>'
             )
         }
+    }
+
+    $('#search').on('keyup', function() {
+        var query = this.value
+        localStorage.setItem('nodoc_lastQuery', query)
+        doSearch(query)
     })
 
     // clicked on a methods, show docs
@@ -122,7 +135,6 @@
 
     function display(idx) {
         var method = index[idx]
-        window.location.hash = '#!' + idx.replace('#', '.')
         $('.doc')
             .html('')
             .append('<h1>' + method.textRaw + '</h1>')
