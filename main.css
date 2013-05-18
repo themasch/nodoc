@@ -1,0 +1,40 @@
+.results ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+.results ul ul {
+    padding-left: 1em;
+}
+.results li {
+    cursor: pointer;
+}
+.results ul ul li:hover {
+    color: blue;
+}
+.loading {
+    position: absolute;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(250, 250, 250, 0.8);
+    z-index: 999;
+}
+.loading > div {
+    margin: 200px auto;
+    width: 100px;
+    height: 100px;
+    line-height: 100px;
+}
+footer {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    text-align: center;
+}
+.content {
+    margin-bottom: 1.5em;
+}
+.content .span9 {
+    margin-top: 10px;
+}

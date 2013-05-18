@@ -5,54 +5,41 @@
     <title>Document</title>
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
     <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.min.css" rel="stylesheet">
-    <style>
-        .results ul {
-            margin: 0;
-            padding: 0;
-            list-style-type: none;
-        }
-        .results ul ul {
-            padding-left: 1em;
-        }
-        .loading {
-            position: absolute;
-            margin: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(250, 250, 250, 0.8);
-            z-index: 999;
-        }
-        .loading > div {
-            margin: 200px auto;
-            width: 100px;
-            height: 100px;
-            line-height: 100px;
-        }
-    </style>
+    <link href="./main.css" rel="stylesheet">
 </head>
 <body>
     <div class="loading">
-        <div><i class="icon-spinner icon-spin icon-large""></i></div>
+        <div><i class="icon-spinner icon-spin icon-large"></i></div>
     </div>
     <div class="navbar navbar-static-top">
         <div class="navbar-inner">
-            <div class="container-fluid">
+            <div class="container">
                 <form class="navbar-search pull-left">
                     <input type="search" class="search-query" name="search" id="search" />
                 </form>
+                <div class="pull-right">
+                    <a class="brand pull-right" href="#">
+                        node.js API docs
+                    </a>
+                </div>
             </div>
         </div>
     </div>
-    <div class="container-fluid">
+    <div class="container-fluid content">
         <div class="row-fluid">
             <div class="span3 well well-small">
                 <div class="results"></div>
             </div>
-            <div class="span9" style="margin-top: 10px">
+            <div class="span9">
                 <div class="doc"></div>
             </div>
         </div>
     </div>
+    <footer>
+        <a href="http://nodejs.org">nodejs.org</a> |
+        <a href="http://nodejs.org/api/">nodejs.org/api/</a> |
+        <a href="https://github.com/themasch/nodoc">nodoc on github</a>
+    </footer>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
     <script src="./main.js"></script>
 </body>
