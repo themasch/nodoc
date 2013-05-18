@@ -13,23 +13,39 @@
         // generate index for fast searching
         for(var m=0;m < data.methods.length;m++) {
             var name = '#' + data.methods[m].name.toLowerCase();
-            index[name] = ['g', m].join('.')
+            index[name] = data.methods[m]
+        }
+        for(var m=0;m < data.vars.length;m++) {
+            var name = '#' + data.vars[m].name.toLowerCase();
+            index[name] = data.vars[m]
+        }
+        for(var m=0;m < data.globals.length;m++) {
+            var mod = data.globals[m]
+            if(mod.methods) {
+                for(var i=0;i < data.globals.length;i++) {
+                    var name = mod.name.toLowerCase() + '#' + mod.methods[i].name.toLowerCase();
+                    index[name] = mod.methods[i]
+                }
+            }
         }
         for(var i=0;i < data.modules.length;i++) {
             var mod = data.modules[i];
             if(mod.methods) {
                 for(var m=0;m < mod.methods.length;m++) {
                     var name = mod.name + '#' + mod.methods[m].name.toLowerCase();
-                    index[name] = [i, m].join('.')
+                    index[name] = mod.methods[m]
                 }
             }
             if(mod.vars) {
-                for(var n=0;n < mod.vars.length;n++) {
-                    var name = mod.name + '#' + mod.vars[n].name.toLowerCase();
-                    if(index[name]) {
-                        console.log('collision: ', name)
-                    }
-                    index[name] = [i, n].join('.')
+                for(var m=0;m < mod.vars.length;m++) {
+                    var name = mod.name + '#' + mod.vars[m].name.toLowerCase();
+                    index[name] = mod.vars[m]
+                }
+            }
+            if(mod.properties) {
+                for(var m=0;m < mod.properties.length;m++) {
+                    var name = mod.name + '#' + mod.properties[m].name.toLowerCase();
+                    index[name] = mod.properties[m]
                 }
             }
         }
@@ -78,32 +94,26 @@
             }
             pool = newPool
         }
-        for(var key in pool) {
-            result.push([key, pool[key]])
-        }
+        result = Object.keys(pool)
         // render results as a list (this is nasty)
         var ul = $('<ul>').appendTo($('.results').html(''));
         var list = {}
         for(var i=0;i<result.length;i++) {
-            var mod = result[i][0].split('#')[0]
+            var mod = result[i].split('#')[0]
             if(!list[mod]) {
                 list[mod] = $('<ul>').appendTo($('<li>' + mod + '</li>').appendTo(ul));
             }
             list[mod].append(
-                '<li class="method" data-idx="' + result[i][1] +
-                '">#' + result[i][0].split('#')[1] + '</li>'
+                '<li class="method" data-idx="' + result[i] +
+                '">#' + result[i].split('#')[1] + '</li>'
             )
         }
     })
 
     // clicked on a methods, show docs
     $('.results').on('click', 'li.method', function(evt) {
-        var idxs = this.dataset['idx'].split('.')
-        if(idxs[0] === 'g') {
-            var method = docs.methods[idxs[1]]
-        } else {
-            var method = docs.modules[idxs[0]].methods[idxs[1]]
-        }
+        var idxs = this.dataset['idx']
+        var method = index[idxs]
         $('.doc')
             .html('')
             .append('<h1>' + method.textRaw + '</h1>')
