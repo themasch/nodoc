@@ -21,37 +21,24 @@
         }
         for(var m=0;m < data.globals.length;m++) {
             var mod = data.globals[m]
-            if(mod.methods) {
-                for(var i=0;i < data.globals.length;i++) {
-                    var name = mod.name.toLowerCase() + '#' + mod.methods[i].name.toLowerCase();
-                    index[name] = mod.methods[i]
-                }
-            }
+            indexModule(index, mod)
         }
         for(var i=0;i < data.modules.length;i++) {
             var mod = data.modules[i];
-            if(mod.methods) {
-                for(var m=0;m < mod.methods.length;m++) {
-                    var name = mod.name + '#' + mod.methods[m].name.toLowerCase();
-                    index[name] = mod.methods[m]
-                }
+            indexModule(index, mod)
+            if(!mod.classes) {
+                continue;
             }
-            if(mod.vars) {
-                for(var m=0;m < mod.vars.length;m++) {
-                    var name = mod.name + '#' + mod.vars[m].name.toLowerCase();
-                    index[name] = mod.vars[m]
-                }
+            for(var c=0;c<mod.classes.length;c++) {
+                var modc = mod.classes[c];
+                indexModule(index, modc)
+
             }
-            if(mod.properties) {
-                for(var m=0;m < mod.properties.length;m++) {
-                    var name = mod.name + '#' + mod.properties[m].name.toLowerCase();
-                    index[name] = mod.properties[m]
-                }
-            }
+
         }
         console.timeEnd('index')
         if(window.location.hash.match(/#!(.+)/)) {
-            var idx = window.location.hash.replace(/^#!/, '').replace('.', '#')
+            var idx = window.location.hash.replace(/^#!/, '')
             console.log(idx)
             display(idx)
         }
@@ -62,6 +49,36 @@
         }
         $('.loading').hide().remove()
     })
+
+function indexModule(index, mod)
+{
+    var modname = mod.name.toLowerCase();
+    index[modname + '#_idx_'] = mod
+    if(mod.methods) {
+        for(var m=0;m < mod.methods.length;m++) {
+            var name =  modname + '#' + mod.methods[m].name.toLowerCase();
+            index[name] = mod.methods[m]
+        }
+    }
+    if(mod.vars) {
+        for(var m=0;m < mod.vars.length;m++) {
+            var name = modname + '#v:' + mod.vars[m].name.toLowerCase();
+            index[name] = mod.vars[m]
+        }
+    }
+    if(mod.properties) {
+        for(var m=0;m < mod.properties.length;m++) {
+            var name = modname + '#p:' + mod.properties[m].name.toLowerCase();
+            index[name] = mod.properties[m]
+        }
+    }
+    if(mod.events) {
+        for(var m=0;m < mod.events.length;m++) {
+            var name = modname + '#evt:' + mod.events[m].name.toLowerCase();
+            index[name] = mod.events[m]
+        }
+    }
+}
 
 
     // do the search
@@ -76,7 +93,7 @@
 
             if(qry.trim() === '')
                 continue
-
+            qry = qry.replace(/^event:/, 'evt:')
             if(qry.match(/^-[\S]+/) || qry.match(/^not:[\S]+/)) {
                 qry = qry.replace(/^(-|not:)/, '')
                 negate = true
@@ -109,13 +126,27 @@
         var list = {}
         for(var i=0;i<result.length;i++) {
             var mod = result[i].split('#')[0]
+            var sub = result[i].split('#')[1]
+
+            if(sub === '_idx_')
+                continue;
+
+            var subName = sub.replace('evt:', 'Event: ')
+                             .replace('p:', 'Prop.: ')
+                             .replace('v:', 'Var: ')
+
             if(!list[mod]) {
-                list[mod] = $('<ul>').appendTo($('<li>' + mod + '</li>').appendTo(ul));
+                list[mod] = $('<ul>').appendTo(
+                    $('<li>' +
+                        '<a href="#!' + mod + '#_idx_">' + mod + '</a>' +
+                      '</li>')
+                        .appendTo(ul)
+                );
             }
             list[mod].append(
                 '<li class="method" data-idx="' + result[i] +'">' +
-                    '<a href="#!' + result[i].replace('#', '.') + '">' +
-                        '#' + result[i].split('#')[1] +
+                    '<a href="#!' + result[i] + '">' +
+                        subName +
                     '</a>' +
                 '</li>'
             )
@@ -128,10 +159,9 @@
         doSearch(query)
     })
 
-    // clicked on a methods, show docs
-    $('.results').on('click', 'li.method', function(evt) {
-        display(this.dataset['idx'])
-    })
+    window.addEventListener('hashchange', function() {
+        display(window.location.hash.replace(/^#!/, ''))
+    }, false)
 
     function display(idx) {
         var method = index[idx]
