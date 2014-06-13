@@ -12,11 +12,11 @@
         console.time('index')
         // generate index for fast searching
         for(var m=0;m < data.methods.length;m++) {
-            var name = '#' + data.methods[m].name.toLowerCase();
+            var name = '#' + data.methods[m].name
             index[name] = data.methods[m]
         }
         for(var m=0;m < data.vars.length;m++) {
-            var name = '#' + data.vars[m].name.toLowerCase();
+            var name = '#' + data.vars[m].name
             index[name] = data.vars[m]
         }
         for(var m=0;m < data.globals.length;m++) {
@@ -52,29 +52,30 @@
 
 function indexModule(index, mod)
 {
-    var modname = mod.name.toLowerCase();
+    var modname = mod.name
     index[modname + '#_idx_'] = mod
     if(mod.methods) {
         for(var m=0;m < mod.methods.length;m++) {
-            var name =  modname + '#' + mod.methods[m].name.toLowerCase();
+            mod.methods[m].modname = modname
+            var name =  modname + '#' + mod.methods[m].name
             index[name] = mod.methods[m]
         }
     }
     if(mod.vars) {
         for(var m=0;m < mod.vars.length;m++) {
-            var name = modname + '#v:' + mod.vars[m].name.toLowerCase();
+            var name = modname + '#v:' + mod.vars[m].name
             index[name] = mod.vars[m]
         }
     }
     if(mod.properties) {
         for(var m=0;m < mod.properties.length;m++) {
-            var name = modname + '#p:' + mod.properties[m].name.toLowerCase();
+            var name = modname + '#p:' + mod.properties[m].name
             index[name] = mod.properties[m]
         }
     }
     if(mod.events) {
         for(var m=0;m < mod.events.length;m++) {
-            var name = modname + '#evt:' + mod.events[m].name.toLowerCase();
+            var name = modname + '#evt:' + mod.events[m].name
             index[name] = mod.events[m]
         }
     }
@@ -88,20 +89,20 @@ function indexModule(index, mod)
         var pool  = index;
         for(var i=0;i<parts.length;i++) {
             var newPool = {}
-            var qry = parts[i].toLowerCase()
+            var qry = parts[i]
             var negate = false
 
             if(qry.trim() === '')
                 continue
             qry = qry.replace(/^event:/, 'evt:')
-            if(qry.match(/^-[\S]+/) || qry.match(/^not:[\S]+/)) {
+            if(qry.match(/^-[\S]+/i) || qry.match(/^not:[\S]+/i)) {
                 qry = qry.replace(/^(-|not:)/, '')
                 negate = true
                 newPool = pool
             }
 
             for(var key in pool) {
-                var match = key.match(new RegExp('[^#]*#.*(' + qry + ').*'))
+                var match = key.match(new RegExp('[^#]*#.*(' + qry + ').*', 'i'))
                 if(match && match[1]) {
                     if(!negate)
                         newPool[key] = pool[key]
@@ -110,7 +111,7 @@ function indexModule(index, mod)
 
                     continue;
                 }
-                match = key.match(new RegExp('.*(' + qry + ')[^#]*#.*'))
+                match = key.match(new RegExp('.*(' + qry + ')[^#]*#.*', 'i'))
                 if(match && match[1]) {
                     if(!negate)
                         newPool[key] = pool[key]
