@@ -54,11 +54,13 @@ function indexModule(index, mod)
 {
     var modname = mod.name
     index[modname + '#_idx_'] = mod
+    console.log(mod)
     if(mod.methods) {
         for(var m=0;m < mod.methods.length;m++) {
             mod.methods[m].modname = modname
             var name =  modname + '#' + mod.methods[m].name
             index[name] = mod.methods[m]
+            index['txt_' + mod.methods[m].textRaw.replace(/\(.*\)$/, '')] = mod.methods[m]
         }
     }
     if(mod.vars) {
@@ -164,6 +166,25 @@ function indexModule(index, mod)
         display(window.location.hash.replace(/^#!/, ''))
     }, false)
 
+    function parseDescription(desc) {
+        desc = desc.replace(/\[([A-Za-z0-9\.()]+)\]\[\]/g, function(full, method, n, input) {
+            console.log(input, full)
+            var methodName = method.replace(/\(.*\)$/, '')
+            if(methodName in index) {
+                return '<a href="#!' + method.replace('.', '#') + '">' + method + '</a>'
+            }
+            if('txt_' + methodName in index) {
+                var mod = index['txt_' + methodName]
+                return '<a href="#!' + mod.modname + '#' + mod.name + '">' + method + '</a>'
+            }
+            if(methodName + '#_idx_' in index) {
+                return '<a href="#!' + methodName + '">' + methodName + '</a>'
+            }
+            console.log(index, methodName + '#_idx_')
+        })
+        return desc
+    }
+
     function display(idx) {
         if(!index[idx]) {
             return;
@@ -195,9 +216,10 @@ function indexModule(index, mod)
                 header += '<br /> <i class="icon-caret-right"></i> ' + type
             }
         }
+        var desc = parseDescription(method.desc)
         $('.doc')
             .html('')
             .append('<h1>' + header + '</h1>')
-            .append('<section>' + method.desc + '</section>')
+            .append('<section>' + desc + '</section>')
     }
 })()
